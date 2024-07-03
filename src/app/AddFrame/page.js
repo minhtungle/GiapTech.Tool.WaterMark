@@ -5,7 +5,7 @@ import { Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, ButtonGroup, Mo
 import html2canvas from 'html2canvas';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import styles from "@/app/page.module.css";
+import styles from "../page.module.css";
 import { Container, Row, Col } from "react-bootstrap";
 // import Select from 'react-select'
 import dynamic from "next/dynamic";
@@ -14,7 +14,7 @@ const Select = dynamic(() => import("react-select"), { ssr: false });
 
 export default function Home() {
   const [imgs, setImgs] = useState([{
-    src: "/anhmau.jpg",
+    src: "./anhmau.jpg",
     name: "anhmau.jpg",
     checked: true
   }]);
@@ -141,9 +141,9 @@ export default function Home() {
           </Col>
           <Col md="6" className="demo-container">
             {/* <img src="/logo-full.png" className="logo-img"></img> */}
-            <img src="/header.png" className="logo-img"></img>
+            <img src="./header.png" className="logo-img"></img>
             <div className="demo-img-container">
-              <img src="/wm-full-30.png" className="wm-img"></img>
+              <img src="./wm-full-30.png" className="wm-img"></img>
               {/* <img src="/anhmau.jpg" className="demo-img"></img> */}
               {imgs.length == 0 ? <></> : <img src={imgs[0].src} className="demo-img"></img>}
             </div>
@@ -153,9 +153,9 @@ export default function Home() {
       {
         imgs.map((img, i) => {
           return <Col key={i.toString()} md="6" className="real-container">
-            <img src="/header.png" className="logo-img"></img>
+            <img src="./header.png" className="logo-img"></img>
             <div className="real-img-container">
-              <img src="/wm-full-30.png" className="wm-img"></img>
+              <img src="./wm-full-30.png" className="wm-img"></img>
               <img src={img.src} className="real-img"></img>
             </div>
           </Col>
