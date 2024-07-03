@@ -1,8 +1,10 @@
 'use client'
 'use client'
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, ButtonGroup, Modal } from 'react-bootstrap';
 import html2canvas from 'html2canvas';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 import styles from "@/app/page.module.css";
 import { Container, Row, Col } from "react-bootstrap";
 // import Select from 'react-select'
@@ -11,9 +13,8 @@ const Select = dynamic(() => import("react-select"), { ssr: false });
 
 
 export default function Home() {
-  const [modal, setModal] = useState(false);
   const [imgs, setImgs] = useState([{
-    src: "/anhmau.jpg",
+    src: "/../public/anhmau.jpg",
     name: "anhmau.jpg",
     checked: true
   }]);
@@ -34,6 +35,11 @@ export default function Home() {
     let demoImg = document.getElementsByClassName("demo-img")[0];
     demoImg.src = newValue.value;
   };
+  const changeImg_ = () => {
+    let selectImgs = document.getElementById("select-imgs");
+    let demoImg = document.getElementsByClassName("demo-img")[0];
+    demoImg.src = selectImgs.value;
+  }
   const uploadImgs = () => {
     let inputUpload = document.getElementById("input-upload-img");
     inputUpload.addEventListener("change", function (e) {
@@ -47,46 +53,58 @@ export default function Home() {
           src: URL.createObjectURL(imgBlob),
           name: file.name,
         });
-        // let image = new Image();
-        // let imageProperties = {};
-        // image.src = URL.createObjectURL(imgBlob);
-        // image.onload = function () {
-        //   let _image = this;
-        //   imageProperties = {
-        //     checked: false,
-        //     src: _image.src,
-        //     name: file.name,
-        //     orginWidth: _image.width,
-        //     orginHeight: _image.height,
-        //     originAspectRatio: (_image.width / _image.height),
-        //   };
-        //   setImgs(prev => ([
-        //     // ...prev,
-        //     imageProperties
-        //   ]));
-        // };
-        // imgs.push(imageProperties);
       };
-      // console.log(imgs);
       setImgs(imgs);
     });
     inputUpload?.click();
   };
   const downloadImgs = () => {
     if (imgs.length > 0) {
-      // const container = imgDemoRefs.current;
-      const container = document.getElementsByClassName("real-container")[0];
-      // Tạm thời đặt display thành 'block' (hoặc bất cứ giá trị nào khác phù hợp)
-      container.style.display = 'block';
-      html2canvas(container).then(canvas => {
-        const imgBase64 = canvas.toDataURL("image/png");
+      if (imgs.length == 1) {
+        // const container = imgDemoRefs.current;
+        const container = document.getElementsByClassName("real-container")[0];
+        // Tạm thời đặt display thành 'block' (hoặc bất cứ giá trị nào khác phù hợp)
+        container.style.display = 'block';
+        html2canvas(container).then(canvas => {
+          const imgBase64 = canvas.toDataURL("image/png");
 
-        const link = document.createElement("a");
-        link.href = imgBase64;
-        link.download = imgs[0].name;
-        link.click();
-      });
-      container.style.display = 'none';
+          const link = document.createElement("a");
+          link.href = imgBase64;
+          link.download = imgs[0].name;
+          link.click();
+        });
+        container.style.display = 'none';
+      } else {
+        const zip = new JSZip();
+        // Mảng chứa các promise từ html2canvas
+        const promises = [];
+        // Duyệt qua mảng imgs và tạo canvas từng ảnh
+        imgs.forEach((img, index) => {
+          const container = document.getElementsByClassName("real-container")[index];
+          container.style.display = 'block'; // Hiển thị phần tử để tạo canvas
+
+          // Tạo promise từ html2canvas
+          const promise = html2canvas(container).then(canvas => {
+            const imgBase64 = canvas.toDataURL("image/png").split(",")[1];
+            zip.file(img.name, imgBase64, { base64: true });
+
+            container.style.display = 'none'; // Ẩn phần tử sau khi đã tạo canvas
+
+            return imgBase64; // Trả về imgBase64 cho promise chain
+          });
+
+          promises.push(promise);
+        });
+
+        // Đợi cho tất cả các promises hoàn thành trước khi tạo và tải file zip
+        Promise.all(promises).then(() => {
+          zip.generateAsync({ type: "blob" })
+            .then(function (content) {
+              // Sử dụng thư viện FileSaver.js hoặc một phương thức tương tự để lưu file zip
+              saveAs(content, "images.zip");
+            });
+        });
+      };
     };
   }
   return (
@@ -98,6 +116,13 @@ export default function Home() {
             <button onClick={() => uploadImgs()}>
               Tải lên
             </button>
+            {/* <select id="select-imgs" onChange={changeImg}>
+              {
+                imgs.map((img, index) => {
+                  return <option key={index.toString()} value={img.src}>{img.name}</option>
+                })
+              }
+            </select> */}
             {
               (() => {
                 let options = imgs.map(img => ({
@@ -116,11 +141,11 @@ export default function Home() {
           </Col>
           <Col md="6" className="demo-container">
             {/* <img src="/logo-full.png" className="logo-img"></img> */}
-            <img src="/header.png" className="logo-img"></img>
+            <img src="/../public/header.png" className="logo-img"></img>
             <div className="demo-img-container">
-              <img src="/wm-full-30.png" className="wm-img"></img>
+              <img src="/../public/wm-full-30.png" className="wm-img"></img>
               {/* <img src="/anhmau.jpg" className="demo-img"></img> */}
-              <img src={imgs[0].src} className="demo-img"></img>
+              {imgs.length == 0 ? <></> : <img src={imgs[0].src} className="demo-img"></img>}
             </div>
           </Col>
         </Row>
@@ -128,9 +153,9 @@ export default function Home() {
       {
         imgs.map((img, i) => {
           return <Col key={i.toString()} md="6" className="real-container">
-            <img src="/header.png" className="logo-img"></img>
+            <img src="/../public/header.png" className="logo-img"></img>
             <div className="real-img-container">
-              <img src="/wm-full-30.png" className="wm-img"></img>
+              <img src="/../public/wm-full-30.png" className="wm-img"></img>
               <img src={img.src} className="real-img"></img>
             </div>
           </Col>
