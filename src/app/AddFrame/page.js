@@ -1,14 +1,14 @@
 'use client'
-import { useState, Suspense } from 'react';
+import { useState } from 'react';
 import html2canvas from 'html2canvas';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import styles from "../page.module.css";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, ButtonGroup } from "react-bootstrap";
+import { Icon } from '../components/Icon';
 // import Select from 'react-select'
 import dynamic from "next/dynamic";
 const Select = dynamic(() => import("react-select"), { ssr: false });
-
 
 export default function Home() {
   const [imgs, setImgs] = useState([{
@@ -16,6 +16,19 @@ export default function Home() {
     name: "anhmau.jpg",
     checked: true
   }]);
+  const [wmImgs, setWmImgs] = useState([{
+    src: "./wm-40.png",
+    name: "Single.png",
+    className: "wm-img",
+    checked: true
+  }, {
+    src: "./wm-full-40.png",
+    name: "Multiple.png",
+    className: "wm-full-img",
+    checked: false
+  },
+  ]);
+
   const changeImg = (newValue, actionMeta) => {
     switch (actionMeta.action) {
       case 'remove-value':
@@ -33,6 +46,27 @@ export default function Home() {
     let demoImg = document.getElementsByClassName("demo-img")[0];
     demoImg.src = newValue.value;
   };
+  const changeWmImg = (newValue, actionMeta) => {
+    switch (actionMeta.action) {
+      case 'remove-value':
+      case 'pop-value':
+        if (actionMeta.removedValue.isFixed) {
+          return;
+        }
+        break;
+      case 'clear':
+        newValue = colourOptions.filter((v) => v.isFixed);
+        break;
+    };
+    let wmImgs_NEW = wmImgs.map(wmImg => {
+      wmImg.checked = false;
+      if (wmImg.name == newValue.label) {
+        wmImg.checked = true;
+      };
+      return { ...wmImg };
+    })
+    setWmImgs(wmImgs_NEW);
+  };
   const changeImg_ = () => {
     let selectImgs = document.getElementById("select-imgs");
     let demoImg = document.getElementsByClassName("demo-img")[0];
@@ -43,7 +77,6 @@ export default function Home() {
     inputUpload.addEventListener("change", function (e) {
       let files = e.target.files,
         imgs = [];
-      // if (files.length > 0) setImgs([]);
       for (const file of files) {
         const imgBlob = new Blob([file], { type: "image/jpeg" });
         imgs.push({
@@ -108,59 +141,101 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <input type="file" id="input-upload-img" accept=".png, .jpg, .jpeg" multiple hidden />
-      {/* <Suspense fallback={<h2>Loading...</h2>}> */}
       <Container fluid>
         <Row>
-          <Col md="6" className="list-imgs-container">
-            <button onClick={() => uploadImgs()}>
-              Tải lên
-            </button>
-            {/* <select id="select-imgs" onChange={changeImg}>
-              {
-                imgs.map((img, index) => {
-                  return <option key={index.toString()} value={img.src}>{img.name}</option>
-                })
-              }
-            </select> */}
-            {
-              (() => {
-                let options = imgs.map(img => ({
-                  value: img.src, label: img.name
-                }));
-                return <Select
-                  defaultValue={options[0]}
-                  options={options}
-                  onChange={changeImg}
-                  id="select-imgs" />
-              })()
-            }
-            <button onClick={() => downloadImgs()}>
-              Tải xuống
-            </button>
+          <Col md="6" className="list-imgs-container d-flex justify-content-center">
+            <Form className="w-100">
+              <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                <Form.Label>Chọn ảnh watermark</Form.Label>
+                {
+                  (() => {
+                    let options = wmImgs.map(img => ({
+                      value: img.src, label: img.name
+                    }));
+                    return <Select
+                      defaultValue={options[0]}
+                      options={options}
+                      onChange={changeWmImg}
+                      id="select-wm-imgs" />
+                  })()
+                }
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                <Form.Label>Chọn ảnh cần ghép</Form.Label>
+                {
+                  (() => {
+                    let options = imgs.map(img => ({
+                      value: img.src, label: img.name
+                    }));
+                    return <Select
+                      defaultValue={options[0]}
+                      options={options}
+                      onChange={changeImg}
+                      id="select-imgs" />
+                  })()
+                }
+              </Form.Group>
+              <div className="d-flex justify-content-center">
+                <ButtonGroup className="w-100">
+                  <Button variant="primary" onClick={() => uploadImgs()}>
+                    <Icon
+                      iconName="Upload"
+                      color=""
+                      className="align-center" />
+                    &ensp;Tải lên</Button>
+                  <Button variant="success" onClick={() => downloadImgs()}>
+                    <Icon
+                      iconName="Download"
+                      color=""
+                      className="align-center" />
+                    &ensp;Tải xuống</Button>
+                </ButtonGroup>
+              </div>
+            </Form>
           </Col>
-          <Col md="6" className="demo-container">
-            {/* <img src="/logo-full.png" className="logo-img"></img> */}
-            <img src="./header.png" className="logo-img"></img>
-            <div className="demo-img-container">
-              <img src="./wm-40.png" className="wm-img"></img>
-              {/* <img src="/anhmau.jpg" className="demo-img"></img> */}
-              {imgs.length == 0 ? <></> : <img src={imgs[0].src} className="demo-img"></img>}
+          <Col md="6" className="d-flex justify-content-center">
+            <div className="demo-container">
+              {/* <img src="/logo-full.png" className="logo-img"></img> */}
+              <img src="./header.png" className="logo-img"></img>
+              <div className="demo-img-container">
+                {
+                  (() => {
+                    let wmImg = wmImgs.filter(x => x.checked)[0];
+                    let src = wmImg.src;
+                    let className = wmImg.className;
+                    return <img src={src} className={className}></img>
+                  })()
+                }
+                {imgs.length == 0 ? <></> : <img src={imgs[0].src} className="demo-img"></img>}
+              </div>
             </div>
           </Col>
         </Row>
       </Container>
-      {
-        imgs.map((img, i) => {
-          return <Col key={i.toString()} md="6" className="real-container">
-            <img src="./header.png" className="logo-img"></img>
-            <div className="real-img-container">
-              <img src="./wm-40.png" className="wm-img"></img>
-              <img src={img.src} className="real-img"></img>
-            </div>
-          </Col>
-        })
-      }
-      {/* </Suspense> */}
+      <Container className="my-2">
+        <Row>
+          {
+            imgs.map((img, i) => {
+              return <Col key={i.toString()} md="12" className="d-flex justify-content-center">
+                <div className="real-container">
+                  <img src="./header.png" className="logo-img"></img>
+                  <div className="real-img-container">
+                    {
+                      (() => {
+                        let wmImg = wmImgs.filter(x => x.checked)[0];
+                        let src = wmImg.src;
+                        let className = wmImg.className;
+                        return <img src={src} className={className}></img>
+                      })()
+                    }
+                    <img src={img.src} className="real-img"></img>
+                  </div>
+                </div>
+              </Col>
+            })
+          }
+        </Row>
+      </Container>
     </main >
   );
 }
