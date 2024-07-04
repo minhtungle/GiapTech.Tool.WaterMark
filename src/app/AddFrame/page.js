@@ -1,7 +1,5 @@
 'use client'
-'use client'
-import { useState } from 'react';
-import { Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, ButtonGroup, Modal } from 'react-bootstrap';
+import { useState, Suspense } from 'react';
 import html2canvas from 'html2canvas';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -110,6 +108,7 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <input type="file" id="input-upload-img" accept=".png, .jpg, .jpeg" multiple hidden />
+      {/* <Suspense fallback={<h2>Loading...</h2>}> */}
       <Container fluid>
         <Row>
           <Col md="6" className="list-imgs-container">
@@ -143,7 +142,7 @@ export default function Home() {
             {/* <img src="/logo-full.png" className="logo-img"></img> */}
             <img src="./header.png" className="logo-img"></img>
             <div className="demo-img-container">
-              <img src="./wm-full-30.png" className="wm-img"></img>
+              <img src="./wm-40.png" className="wm-img"></img>
               {/* <img src="/anhmau.jpg" className="demo-img"></img> */}
               {imgs.length == 0 ? <></> : <img src={imgs[0].src} className="demo-img"></img>}
             </div>
@@ -155,12 +154,13 @@ export default function Home() {
           return <Col key={i.toString()} md="6" className="real-container">
             <img src="./header.png" className="logo-img"></img>
             <div className="real-img-container">
-              <img src="./wm-full-30.png" className="wm-img"></img>
+              <img src="./wm-40.png" className="wm-img"></img>
               <img src={img.src} className="real-img"></img>
             </div>
           </Col>
         })
       }
+      {/* </Suspense> */}
     </main >
   );
 }
