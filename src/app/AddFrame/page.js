@@ -13,7 +13,7 @@ const Select = dynamic(() => import("react-select"), { ssr: false });
 export default function Home() {
   const [imgs, setImgs] = useState([{
     src: "./anhmau.jpg",
-    name: "anhmau.jpg",
+    name: "Không 1 cuộc gọi nhỡ.jpg",
     checked: true
   }]);
   const [wmImgs, setWmImgs] = useState([{
