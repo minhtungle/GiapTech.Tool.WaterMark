@@ -18,12 +18,17 @@ export default function Home() {
   }]);
   const [wmImgs, setWmImgs] = useState([{
     src: "./wm-40.png",
-    name: "Single.png",
+    name: "To chà bá",
     className: "wm-img",
     checked: true
   }, {
     src: "./wm-full-40.png",
-    name: "Multiple.png",
+    name: "Tùm lum tè le",
+    className: "wm-full-img",
+    checked: false
+  }, {
+    src: "",
+    name: "Full HD không che",
     className: "wm-full-img",
     checked: false
   },
@@ -203,7 +208,9 @@ export default function Home() {
                     let wmImg = wmImgs.filter(x => x.checked)[0];
                     let src = wmImg.src;
                     let className = wmImg.className;
-                    return <img src={src} className={className}></img>
+                    if (src != "")
+                      return <img src={src} className={className}></img>
+                    return <></>;
                   })()
                 }
                 {imgs.length == 0 ? <></> : <img src={imgs[0].src} className="demo-img"></img>}
@@ -225,7 +232,9 @@ export default function Home() {
                         let wmImg = wmImgs.filter(x => x.checked)[0];
                         let src = wmImg.src;
                         let className = wmImg.className;
-                        return <img src={src} className={className}></img>
+                        if (src != "")
+                          return <img src={src} className={className}></img>
+                        return <></>;
                       })()
                     }
                     <img src={img.src} className="real-img"></img>
