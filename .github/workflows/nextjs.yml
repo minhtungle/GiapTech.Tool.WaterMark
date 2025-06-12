@@ -72,7 +72,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
       - name: Install dependencies
-        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+        run: |
+          attempt=0
+          max_attempts=3
+          until [ $attempt -ge $max_attempts ]
+          do
+            ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }} && break
+            attempt=$((attempt + 1))
+            echo "Retrying installation... ($attempt/$max_attempts)"
+            sleep 10
+          done
+          if [ $attempt -eq $max_attempts ]; then
+            echo "Failed to install dependencies after $max_attempts attempts."
+            exit 1
+          fi
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
       - name: Upload artifact
