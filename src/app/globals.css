@@ -145,8 +145,8 @@ a {
 }
 
 .demo-img {
-  max-height: 500px;
-  /* width: 100%; */
+  /* max-height: 500px; */
+  width: 100%;
 }
 
 @media (prefers-color-scheme: dark) {

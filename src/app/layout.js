@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Tạo ảnh bản quyền",
-  description: "VIETGEN Academy",
+  description: "VIETGEN Education - Tạo ảnh bản quyền với watermark",
 };
 
 export default function RootLayout({ children }) {

@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react';
-import html2canvas from 'html2canvas';
+import html2canvas from "html2canvas-pro";
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import styles from "../page.module.css";
@@ -183,16 +183,10 @@ export default function Home() {
               <div className="d-flex justify-content-center">
                 <ButtonGroup className="w-100">
                   <Button variant="primary" onClick={() => uploadImgs()}>
-                    <Icon
-                      iconName="Upload"
-                      color=""
-                      className="align-center" />
+
                     &ensp;Tải lên</Button>
                   <Button variant="success" onClick={() => downloadImgs()}>
-                    <Icon
-                      iconName="Download"
-                      color=""
-                      className="align-center" />
+
                     &ensp;Tải xuống</Button>
                 </ButtonGroup>
               </div>
